@@ -1,8 +1,13 @@
 import express from 'express'
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import cors from 'cors'
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
+import {
+    stringToHash,
+    varifyHash
+} from "bcrypt-inzi"
+
 
 
 const SECRET = process.env.SECRET || "topsecret";
@@ -21,89 +26,89 @@ app.use(cookieParser());
 //     credentials: true
 // }));
 
-let products = [] // connect with mongodb
+
+// let productSchema = new mongoose.Schema({
+//     name: { type: String, required: true },
+//     price: Number,
+//     description: String,
+//     createdOn: { type: Date, default: Date.now }
+// });
+// const productModel = mongoose.model('products', productSchema);
 
 
-let productSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    price: Number,
-    description: String,
-    createdOn: { type: Date, default: Date.now }
-});
-const productModel = mongoose.model('products', productSchema);
+// const userSchema = new mongoose.Schema({
+
+//     firstName: { type: String },
+//     lastName: { type: String },
+//     email: { type: String, required: true },
+//     password: { type: String, required: true },
 
 
-const userSchema = new mongoose.Schema({
-
-    firstName: { type: String },
-    lastName: { type: String },
-    email: { type: String, required: true },
-    password: { type: String, required: true },
-
-    
-    createdOn: { type: Date, default: Date.now },
-});
-const userModel = mongoose.model('Users', userSchema);
+//     createdOn: { type: Date, default: Date.now },
+// });
+// const userModel = mongoose.model('Users', userSchema);
 
 app.post("/signup", (req, res) => {
 
-  let body = req.body;
+    let body = req.body;
 
-  if (!body.firstName
-      || !body.lastName
-      || !body.email
-      || !body.password
-  ) {
-      res.status(400).send(
-          `required fields missing, request example: 
+    if (!body.firstName
+        || !body.lastName
+        || !body.email
+        || !body.password
+    ) {
+        res.status(400).send(
+            `required fields missing, request example: 
               {
                   "firstName": "John",
                   "lastName": "Doe",
                   "email": "abc@abc.com",
                   "password": "12345"
               }`
-      );
-      return;
-  }
+        );
+        return;
+    }
 
-  // check if user already exist // query email user
-  userModel.findOne({ email: body.email }, (err, data) => {
-      if (!err) {
-          console.log("data: ", data);
+    req.body.email = req.body.email.toLowerCase();
 
-          if (data) { // user already exist
-              console.log("user already exist: ", data);
-              res.status(400).send({ message: "user already exist,, please try a different email" });
-              return;
+    // check if user already exist // query email user
+    userModel.findOne({ email: body.email }, (err, user) => {
+        if (!err) {
+            console.log("user: ", user);
 
-          } else { // user not already exist
+            if (user) { // user already exist
+                console.log("user already exist: ", user);
+                res.status(400).send({ message: "user already exist,, please try a different email" });
+                return;
 
-              stringToHash(body.password).then(hashString => {
+            } else { // user not already exist
 
-                  userModel.create({
-                      firstName: body.firstName,
-                      lastName: body.lastName,
-                      email: body.email.toLowerCase(),
-                      password: hashString
-                  },
-                      (err, result) => {
-                          if (!err) {
-                              console.log("data saved: ", result);
-                              res.status(201).send({ message: "user is created" });
-                          } else {
-                              console.log("db error: ", err);
-                              res.status(500).send({ message: "internal server error" });
-                          }
-                      });
-              })
+                stringToHash(body.password).then(hashString => {
 
-          }
-      } else {
-          console.log("db error: ", err);
-          res.status(500).send({ message: "db error in query" });
-          return;
-      }
-  })
+                    userModel.create({
+                        firstName: body.firstName,
+                        lastName: body.lastName,
+                        email: body.email,
+                        password: hashString
+                    },
+                        (err, result) => {
+                            if (!err) {
+                                console.log("user saved: ", result);
+                                res.status(201).send({ message: "user is created" });
+                            } else {
+                                console.log("db error: ", err);
+                                res.status(500).send({ message: "internal server error" });
+                            }
+                        });
+                })
+
+            }
+        } else {
+            console.log("db error: ", err);
+            res.status(500).send({ message: "db error in query" });
+            return;
+        }
+    })
 });
 
 
@@ -122,11 +127,14 @@ app.post("/login", (req, res) => {
         return;
     }
 
+    body.email = body.email.toLowerCase();
+
+
     // check if user already exist // query email user
     userModel.findOne(
         { email: body.email },
         // { email:1, firstName:1, lastName:1, age:1, password:0 },
-        "email firstName lastName age password",
+        "email firstName lastName password",
         (err, data) => {
             if (!err) {
                 console.log("data: ", data);
@@ -138,7 +146,7 @@ app.post("/login", (req, res) => {
 
                         if (isMatched) {
 
-                            var token = jwt.sign({
+                            const token = jwt.sign({
                                 _id: data._id,
                                 email: data.email,
                                 iat: Math.floor(Date.now() / 1000) - 30,
@@ -186,6 +194,55 @@ app.post("/login", (req, res) => {
 
 })
 
+
+app.post("/logout", (req, res) => {
+
+    res.cookie('Token', '', {
+        maxAge: 1,
+        httpOnly: true
+    });
+
+    res.send({ message: "Logout successful" });
+})
+
+
+app.use( (req, res, next) => {
+    console.log("req.cookies: ", req.cookies);
+
+    if (!req?.cookies?.Token) {
+        res.status(401).send({
+            message: "include http-only credentials with every request"
+        })
+        return;
+    }
+    jwt.verify(req.cookies.Token, SECRET, function (err, decodedData) {
+        if (!err) {
+
+            console.log("decodedData: ", decodedData);
+
+            const nowDate = new Date().getTime() / 1000;
+
+            if (decodedData.exp < nowDate) {
+                res.status(401);
+
+                res.cookie('Token', '', {
+                    maxAge: 1,
+                    httpOnly: true
+                });
+            
+                res.send({message: "token expired"});
+            } else {
+
+                console.log("token approved");
+
+                req.body.token = decodedData
+                next();
+            }
+        } else {
+            res.status(401).send("invalid token")
+        }
+    });
+})
 
 
 
@@ -345,30 +402,30 @@ app.listen(port, () => {
 })
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-mongoose.connect(mongodbURI);
+// /////////////////////////////////////////////////////////////////////////////////////////////////
+// mongoose.connect(mongodbURI);
 
 
-////////////////mongodb connected disconnected events///////////////////////////////////////////////
-mongoose.connection.on('connected', function () {//connected
-    console.log("Mongoose is connected");
-});
+// ////////////////mongodb connected disconnected events///////////////////////////////////////////////
+// mongoose.connection.on('connected', function () {//connected
+//     console.log("Mongoose is connected");
+// });
 
-mongoose.connection.on('disconnected', function () {//disconnected
-    console.log("Mongoose is disconnected");
-    process.exit(1);
-});
+// mongoose.connection.on('disconnected', function () {//disconnected
+//     console.log("Mongoose is disconnected");
+//     process.exit(1);
+// });
 
-mongoose.connection.on('error', function (err) {//any error
-    console.log('Mongoose connection error: ', err);
-    process.exit(1);
-});
+// mongoose.connection.on('error', function (err) {//any error
+//     console.log('Mongoose connection error: ', err);
+//     process.exit(1);
+// });
 
-process.on('SIGINT', function () {/////this function will run jst before app is closing
-    console.log("app is terminating");
-    mongoose.connection.close(function () {
-        console.log('Mongoose default connection closed');
-        process.exit(0);
-    });
-});
-  ////////////////mongodb connected disconnected events///////////////////////////////////////////////
+// process.on('SIGINT', function () {/////this function will run jst before app is closing
+//     console.log("app is terminating");
+//     mongoose.connection.close(function () {
+//         console.log('Mongoose default connection closed');
+//         process.exit(0);
+//     });
+// });
+//   ////////////////mongodb connected disconnected events///////////////////////////////////////////////
