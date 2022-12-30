@@ -1,5 +1,5 @@
 import express from 'express'
-// import mongoose from 'mongoose';
+import mongoose from 'mongoose';
 import cors from 'cors'
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
@@ -27,26 +27,26 @@ app.use(cookieParser());
 // }));
 
 
-// let productSchema = new mongoose.Schema({
-//     name: { type: String, required: true },
-//     price: Number,
-//     description: String,
-//     createdOn: { type: Date, default: Date.now }
-// });
-// const productModel = mongoose.model('products', productSchema);
+let productSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    price: Number,
+    description: String,
+    createdOn: { type: Date, default: Date.now }
+});
+const productModel = mongoose.model('products', productSchema);
 
 
-// const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
 
-//     firstName: { type: String },
-//     lastName: { type: String },
-//     email: { type: String, required: true },
-//     password: { type: String, required: true },
+    firstName: { type: String },
+    lastName: { type: String },
+    email: { type: String, required: true },
+    password: { type: String, required: true },
 
 
-//     createdOn: { type: Date, default: Date.now },
-// });
-// const userModel = mongoose.model('Users', userSchema);
+    createdOn: { type: Date, default: Date.now },
+});
+const userModel = mongoose.model('Users', userSchema);
 
 app.post("/signup", (req, res) => {
 
@@ -402,30 +402,30 @@ app.listen(port, () => {
 })
 
 
-// /////////////////////////////////////////////////////////////////////////////////////////////////
-// mongoose.connect(mongodbURI);
+/////////////////////////////////////////////////////////////////////////////////////////////////
+mongoose.connect(mongodbURI);
 
 
-// ////////////////mongodb connected disconnected events///////////////////////////////////////////////
-// mongoose.connection.on('connected', function () {//connected
-//     console.log("Mongoose is connected");
-// });
+////////////////mongodb connected disconnected events///////////////////////////////////////////////
+mongoose.connection.on('connected', function () {//connected
+    console.log("Mongoose is connected");
+});
 
-// mongoose.connection.on('disconnected', function () {//disconnected
-//     console.log("Mongoose is disconnected");
-//     process.exit(1);
-// });
+mongoose.connection.on('disconnected', function () {//disconnected
+    console.log("Mongoose is disconnected");
+    process.exit(1);
+});
 
-// mongoose.connection.on('error', function (err) {//any error
-//     console.log('Mongoose connection error: ', err);
-//     process.exit(1);
-// });
+mongoose.connection.on('error', function (err) {//any error
+    console.log('Mongoose connection error: ', err);
+    process.exit(1);
+});
 
-// process.on('SIGINT', function () {/////this function will run jst before app is closing
-//     console.log("app is terminating");
-//     mongoose.connection.close(function () {
-//         console.log('Mongoose default connection closed');
-//         process.exit(0);
-//     });
-// });
-//   ////////////////mongodb connected disconnected events///////////////////////////////////////////////
+process.on('SIGINT', function () {/////this function will run jst before app is closing
+    console.log("app is terminating");
+    mongoose.connection.close(function () {
+        console.log('Mongoose default connection closed');
+        process.exit(0);
+    });
+});
+  ////////////////mongodb connected disconnected events///////////////////////////////////////////////
