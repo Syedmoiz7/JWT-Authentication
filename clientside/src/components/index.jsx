@@ -22,9 +22,7 @@ function Render() {
   return (
 
     <div className="App">
-
-      <button onClick={() => { setIsLogin(!isLogin) }}>Toggle Login</button>
-
+      
       {
         (isLogin) ?
           <ul>
