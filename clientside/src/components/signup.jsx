@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { Routes, Route, Link, Navigate } from "react-router-dom";
+import './signup.css';
 import axios from 'axios';
 
 
@@ -8,7 +10,7 @@ const baseUrl = 'http://localhost:5000'
 function Signup() {
 
     const [name, setName] = useState("")
-    const [lastName, setLastName] = useState("")
+    // const [lastName, setLastName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
@@ -20,7 +22,7 @@ function Signup() {
         try {
             let response = axios.post(`${baseUrl}/signup`, {
                 firstName: name,
-                lastName: lastName,
+                // lastName: lastName,
                 email: email,
                 password: password
             })
@@ -36,24 +38,40 @@ function Signup() {
     }
 
     return (
-        <div>
+        <div className="mainContainer">
+            <div className="heading">
+                <h1>Sign Up</h1>
+            </div>
+
             <form onSubmit={signupHandler}>
-                <label>Name</label>
-                <input type="text" name="name" id="" placeholder="Enter your Name"
-                    onChange={(e) => { setName(e.target.value) }} />
+                <div className="formSignup">
+                    <input type="text" className="inputs" name="name" placeholder="Name"
+                        onChange={(e) => { setName(e.target.value) }} />
+                    <br />
 
-                <label>Last Name</label>
-                <input type="text" name="last name" id="" placeholder="Enter your Name" 
-                onChange={(e) => {setLastName(e.target.value)}} />
+                    <input type="email" className="inputs" name="email" placeholder="Email"
+                        onChange={(e) => { setEmail(e.target.value) }} />
+                    <br />
 
-                <label>Email</label>
-                <input type="email" name="email" id="" placeholder="Enter your Name"
-                onChange={(e) => {setEmail(e.target.value)}} />
+                    <input type="password" className="inputs" name="password" placeholder="Password"
+                        onChange={(e) => { setPassword(e.target.value) }} />
+                    <br />
 
-                <label>Password</label>
-                <input type="password" name="password" id="" placeholder="Enter your Name"
-                onChange={(e) => {setPassword(e.target.value)}} />
+                    <input type="password" className="inputs" name="password"
+                        placeholder="Confirm Password" />
+                    <br />
+
+                    <button type="submit" className='btn'>Sign Up</button>
+
+                    <p>Already have an account?</p>
+
+                    <Link to={'/'}>Login</Link>
+
+
+                </div>
+
             </form>
+
         </div>)
 }
 

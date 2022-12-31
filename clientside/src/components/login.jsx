@@ -1,41 +1,39 @@
 import './login.css'
+import { Routes, Route, Link, Navigate } from "react-router-dom";
 
 function Login() {
-    
-
-
-
 
 
 
     return (
 
         <div className='mainCont'>
-            <div id="one">
+            <div className="heading">
                 <h1>Login</h1>
             </div>
             <div>
                 <form action="">
-                    <div id="two">
-                        <div class="username"><label for="un">Username</label> <br />
+                    <div className='form'>
+                        <div class="username">
                             <div id="padd">
-                                <input type="text" name="username" id="un" placeholder="Username" />
+                                <input type="email" name="email" className="inputs"
+                                    id="un" placeholder="Email" />
                             </div>
                         </div>
                         <div id="pass">
-                            <label for="">Password</label>
                             <div id="paddtwo">
-                                <input type="password" name="" id="password" placeholder="Password" />
+                                <input type="password" name="password" id="password"
+                                    className="inputs" placeholder="Password" />
                             </div>
                         </div>
 
-                        <div id="butt">
+                        <button type='submit' className='btn'>
                             Login
-                        </div>
+                        </button>
 
-                        <div id="a">
-                            <a href="">Register an account </a>
-                        </div>
+                        <p>Don't have an account? </p>
+
+                         <Link to={'/signup'}>Signup</Link>
 
                     </div>
                 </form>

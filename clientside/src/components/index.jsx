@@ -1,4 +1,3 @@
-
 import './index.css';
 
 import { Routes, Route, Link, Navigate } from "react-router-dom";
@@ -33,8 +32,8 @@ function Render() {
           </ul>
           :
           <ul>
-            <li> <Link to={'/'}>Login</Link></li>
-            <li> <Link to={'/signup'}>Signup</Link></li>
+            {/* <li> <Link to={'/'}>Login</Link></li>
+            <li> <Link to={'/signup'}>Signup</Link></li> */}
           </ul>
       }
 
