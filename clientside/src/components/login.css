@@ -2,8 +2,8 @@ body{
     background-image: url('https://media.istockphoto.com/photos/color-paper-background-picture-id1202665295?b=1&k=20&m=1202665295&s=170667a&w=0&h=hYn3h8ASP53WZukDyrJuEFUAjSK7_4VNeYN7dJCcv7U=');
     background-size: cover;
     background-repeat: no-repeat;
-    margin: 0;
-    padding: 0;
+    /* margin: 0;
+    padding: 0; */
 }
 
 
@@ -14,7 +14,7 @@ body{
     align-items: center;
     justify-content: center;
     /* border: 1px solid black; */
-    margin: 0px;
+    /* margin: 0px; */
 }
 
 .heading{
@@ -29,7 +29,7 @@ body{
     width: 300px;
     text-align: center;
     font-size: large;
-    height: 100%;
+    /* height: 100%; */
     padding: 30px 0 ;
 }
 

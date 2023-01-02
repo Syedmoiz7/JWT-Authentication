@@ -2,12 +2,17 @@ import './login.css'
 import { Routes, Route, Link, Navigate } from "react-router-dom";
 import { useState } from "react";
 
+import { GlobalContext } from '../context/Context';
+import { useContext } from "react";
+
 import axios from 'axios';
 
 const baseUrl = 'http://localhost:5000'
 
 
 function Login() {
+    
+    let { state, dispatch } = useContext(GlobalContext);
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
