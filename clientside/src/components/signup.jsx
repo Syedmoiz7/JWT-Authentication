@@ -20,9 +20,9 @@ function Signup() {
         e.preventDefault();
 
         try {
-            let response = axios.post(`${baseUrl}/signup`, {
+            let response = await axios.post(`${baseUrl}/signup`, {
                 firstName: name,
-                // lastName: lastName,
+                lastName: name,
                 email: email,
                 password: password
             })
@@ -32,33 +32,37 @@ function Signup() {
         }
 
         catch (e) {
-            console.log("error ", e);
+            console.log("error: ", e);
         }
 
     }
 
     return (
         <div className="mainContainer">
+            
             <div className="heading">
                 <h1>Sign Up</h1>
             </div>
 
             <form onSubmit={signupHandler}>
                 <div className="formSignup">
-                    <input type="text" className="inputs" name="name" placeholder="Name"
+                    <input type="text" className="inputs" name="name"
+                        placeholder="Name" required
                         onChange={(e) => { setName(e.target.value) }} />
                     <br />
 
-                    <input type="email" className="inputs" name="email" placeholder="Email"
+                    <input type="email" className="inputs" name="email"
+                        placeholder="Email" required
                         onChange={(e) => { setEmail(e.target.value) }} />
                     <br />
 
-                    <input type="password" className="inputs" name="password" placeholder="Password"
+                    <input type="password" className="inputs" name="password"
+                        placeholder="Password" required
                         onChange={(e) => { setPassword(e.target.value) }} />
                     <br />
 
                     <input type="password" className="inputs" name="password"
-                        placeholder="Confirm Password" />
+                        placeholder="Confirm Password" required />
                     <br />
 
                     <button type="submit" className='btn'>Sign Up</button>
@@ -67,10 +71,10 @@ function Signup() {
 
                     <Link to={'/'}>Login</Link>
 
-
                 </div>
-
             </form>
+
+            <p>{result}</p>
 
         </div>)
 }

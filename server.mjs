@@ -16,15 +16,15 @@ const app = express()
 const port = process.env.PORT || 5000
 const mongodbURI = process.env.mongodbURI || "mongodb+srv://abuser:abuser@cluster0.3psj2vc.mongodb.net/?retryWrites=true&w=majority"
 
-app.use(cors());
+// app.use(cors());
 app.use(express.json())
 app.use(cookieParser());
 
 
-// app.use(cors({
-//     origin: ['http://localhost:3000', "*"],
-//     credentials: true
-// }));
+app.use(cors({
+    origin: ['http://localhost:3000', "*"],
+    credentials: true
+}));
 
 
 let productSchema = new mongoose.Schema({
@@ -42,8 +42,6 @@ const userSchema = new mongoose.Schema({
     lastName: { type: String },
     email: { type: String, required: true },
     password: { type: String, required: true },
-
-
     createdOn: { type: Date, default: Date.now },
 });
 const userModel = mongoose.model('Users', userSchema);
@@ -172,7 +170,7 @@ app.post("/login", (req, res) => {
                             });
                             return;
                         } else {
-                            console.log("user not found");
+                            console.log("password did not match");
                             res.status(401).send({ message: "Incorrect email or password" });
                             return;
                         }

@@ -5,7 +5,7 @@ import Render from './components/index.jsx';
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <Render />
     </div>
   );

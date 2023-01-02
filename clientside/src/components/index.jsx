@@ -22,7 +22,7 @@ function Render() {
 
     <div className="App">
       
-      {
+      {/* {
         (isLogin) ?
           <ul>
             <li> <Link to={'/'}>Home</Link></li>
@@ -32,10 +32,10 @@ function Render() {
           </ul>
           :
           <ul>
-            {/* <li> <Link to={'/'}>Login</Link></li>
-            <li> <Link to={'/signup'}>Signup</Link></li> */}
+            <li> <Link to={'/'}>Login</Link></li>
+            <li> <Link to={'/signup'}>Signup</Link></li>
           </ul>
-      }
+      } */}
 
 
       {(isLogin) ?
