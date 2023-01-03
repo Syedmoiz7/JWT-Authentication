@@ -1,6 +1,8 @@
 import './index.css';
-
 import { Routes, Route, Link, Navigate } from "react-router-dom";
+
+import { GlobalContext } from '../context/Context';
+import { useContext } from "react";
 
 import Home from "./home";
 import About from "./about";
@@ -13,17 +15,16 @@ import { useState } from 'react';
 
 function Render() {
 
-  const [isLogin, setIsLogin] = useState(false)
+  let { state, dispatch } = useContext(GlobalContext);
 
-
-
+  // const [isLogin, setIsLogin] = useState(false)
 
   return (
 
     <div className="App">
       
-      {/* {
-        (isLogin) ?
+      {
+        (state.isLogin) ?
           <ul>
             <li> <Link to={'/'}>Home</Link></li>
             <li> <Link to={'/gallery'}>Gallery</Link></li>
@@ -35,10 +36,10 @@ function Render() {
             <li> <Link to={'/'}>Login</Link></li>
             <li> <Link to={'/signup'}>Signup</Link></li>
           </ul>
-      } */}
+      }
 
 
-      {(isLogin) ?
+      {(state.isLogin) ?
 
         <Routes>
           <Route path="/" element={<Home />} />

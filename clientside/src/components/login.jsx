@@ -29,6 +29,11 @@ function Login() {
                 withCredentials: true
             })
 
+            dispatch({
+                type: "USER_LOGIN",
+                payload: null
+            })
+
             console.log("login successfull");
             setResult("login successfull");
         } catch (e) {
