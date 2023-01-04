@@ -3,28 +3,58 @@ import { Routes, Route, Link, Navigate } from "react-router-dom";
 
 import { GlobalContext } from '../context/Context';
 import { useContext } from "react";
+import { useState } from 'react';
+import { useEffect } from 'react';
+import axios from 'axios';
 
 import Home from "./home";
 import About from "./about";
 import Gallery from "./gallery";
 import Login from "./login"
 import Signup from "./signup"
+import { get } from 'mongoose';
 
-import { useState } from 'react';
+
 
 
 function Render() {
 
   let { state, dispatch } = useContext(GlobalContext);
 
+  useEffect(() => {
+    const baseUrl = 'http://localhost:5000'
+
+    const getProfile = async () => {
+
+      try {
+        let response = await axios.get(`${baseUrl}/products`, {
+        withCredentials: true
+      })
+
+      dispatch({
+        type: "USER_LOGIN"
+      })
+      } catch (error) {
+
+        console.log("error: ", error);
+        dispatch({
+          type: "USER_LOGOUT"
+        })
+      }
+
+      
+    }
+    getProfile()
+  }, []);
+
   // const [isLogin, setIsLogin] = useState(false)
 
   return (
 
     <div className="App">
-      
+
       {
-        (state.isLogin) ?
+        (state.isLogin === true) ?
           <ul>
             <li> <Link to={'/'}>Home</Link></li>
             <li> <Link to={'/gallery'}>Gallery</Link></li>
@@ -32,14 +62,21 @@ function Render() {
             <li> <Link to={'/profile'}>Profile</Link></li>
           </ul>
           :
+          null
+      }
+
+      {
+        (state.isLogin === false) ?
           <ul>
             <li> <Link to={'/'}>Login</Link></li>
             <li> <Link to={'/signup'}>Signup</Link></li>
           </ul>
+          :
+          null
       }
 
 
-      {(state.isLogin) ?
+      {(state.isLogin === true) ?
 
         <Routes>
           <Route path="/" element={<Home />} />
@@ -49,14 +86,29 @@ function Render() {
             <Navigate to="/" replace={true} />
           } />
         </Routes>
-        : 
+        :
+        null
+      }
+
+      {(state.isLogin === false) ?
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-
           <Route path="*" element={<Navigate to="/" replace={true} />} />
         </Routes>
+        :
+        null
       }
+
+      {(state.isLogin === null) ?
+        <div>
+          loading
+        </div>
+        :
+        null
+      }
+
+
     </div>
   );
 }
