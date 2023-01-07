@@ -1,6 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose';
 import cors from 'cors'
+import path from 'path'
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
 import {
@@ -247,153 +248,172 @@ app.use( (req, res, next) => {
 
 app.post('/product', (req, res) => {
     const body = req.body;
-
+  
     if (
-        !body.name
-        || !body.price
-        || !body.description
+      !body.name
+      || !body.price
+      || !body.description
     ) {
-        res.status(400).send({
-            message: "require parameters missing",
-        });
-        return
+      res.status(400).send({
+        message: "require parameters missing",
+      });
+      return
     }
     console.log(body.name);
     console.log(body.price);
     console.log(body.description);
-
+  
     // products.push({
     //   id: `${new Date().getTime()}`,
     //   name: body.name,
     //   price: body.price,
     //   description: body.description
     // })
-
+  
     productModel.create({
-        name: body.name,
-        price: body.price,
-        description: body.description,
+      name: body.name,
+      price: body.price,
+      description: body.description,
     },
-        (err, saved) => {
-            if (!err) {
-                console.log(saved);
-
-                res.send({
-                    message: "your product is saved"
-                })
-            } else {
-                res.status(500).send({
-                    message: "server error"
-                })
-            }
-        })
-
-    // res.send({
-    //   message: "product added successfully"
-    // });
-
-})
+      (err, saved) => {
+        if (!err) {
+          console.log(saved);
+  
+          res.send({
+            message: "product added successfully"
+          })
+        } else {
+          res.status(500).send({
+            message: "server error"
+          })
+        }
+      })
+  
+  })
 
 
 app.get('/products', (req, res) => {
-    res.send({
+
+  productModel.find({}, (err, data) => {
+    if (!err) {
+      res.send({
         message: "all products get successfully ",
-        data: products
-    })
+        data: data
+      })
+    } else {
+      res.status(500).send({
+        message: "server error"
+      })
+    }
+  });
+
+
+
+
+
 })
 
 
 app.get('/product/:id', (req, res) => {
+
     const id = req.params.id;
-
-    let isFound = false
-    for (let i = 0; i < products.length; i++) {
-        if (products[i].id === id) {
-            res.send({
-                message: `Got product by id: ${products[i]} successfully`,
-                data: products[i]
-            });
-            isFound = true
-            break;
+  
+    productModel.findOne({ _id: id }, (err, data) => {
+      if (!err) {
+  
+        if (data) {
+          res.send({
+            message: `Got product by id: ${data._id} successfully`,
+            data: data
+          });
+        } else {
+          res.status(404).send({
+            message: "product not found",
+          })
         }
-    }
+  
+      } else {
+        res.status(500).send({
+          message: "server error"
+        })
+      }
+    });
+  })
 
-    if (isFound === false) {
-        res.status(404);
-        res.send({
-            message: "product not found"
-        });
-    }
-})
-
-
-app.delete('/product/:id', (req, res) => {
+  app.delete('/product/:id', (req, res) => {
     const id = req.params.id;
-
-    let isFound = false
-    for (let i = 0; i < products.length; i++) {
-        if (products[i].id === id) {
-
-            products.splice(i, 1)
-            res.send({
-                message: "product deleted successfully"
-            });
-            isFound = true
-            break;
+  
+    productModel.deleteOne({ _id: id }, (err, deletedData) => {
+      console.log("deleted: ", deletedData);
+      if (!err) {
+  
+        if (deletedData.deletedCount !== 0) {
+          res.send({
+            message: "Product has been deleted successfully",
+          })
+        } else {
+          res.status(404);
+          res.send({
+            message: "No Product found with this id: " + id,
+          })
         }
-    }
+  
+      } else {
+        res.status(500).send({
+          message: "server error"
+        })
+      }
+    });
+  })
 
-    if (isFound === false) {
-        res.status(404);
-        res.send({
-            message: "Delete fail: product not found"
-        });
-    }
-})
 
+  app.put('/product/:id', async (req, res) => {
 
-app.put('/product/:id', (req, res) => {
     const body = req.body;
     const id = req.params.id;
-
+  
     if (
-        !body.name
-        || !body.price
-        || !body.description
+      !body.name ||
+      !body.price ||
+      !body.description
     ) {
-        res.status(400).send({
-            message: "require parameters missing"
-        });
-        return
+      res.status(400).send(` required parameter missing. example request body:
+          {
+              "name": "value",
+              "price": "value",
+              "description": "value"
+          }`)
+      return;
     }
-
-    console.log(body.name);
-    console.log(body.price);
-    console.log(body.description);
-
-    let isFound = false
-    for (let i = 0; i < products.length; i++) {
-        if (products[i].id === id) {
-
-            products[i].name = body.name;
-            products[i].price = body.price;
-            products[i].description = body.description;
-
-            res.send({
-                message: "product updated successfully"
-            });
-            isFound = true
-            break;
-        }
+  
+    try {
+      let data = await productModel.findByIdAndUpdate(id,
+        {
+          name: body.name,
+          price: body.price,
+          description: body.description
+        },
+        { new: true }
+      ).exec();
+  
+      console.log('updated: ', data);
+  
+      res.send({
+        message: "product updated successfully",
+        data: data
+      });
+  
+    } catch (error) {
+      // console.log("error: ", error)
+      res.status(500).send({
+        message: "server error"
+      })
     }
-
-    if (!isFound) {
-        res.status(404);
-        res.send({
-            message: "Edit fail: product not found"
-        });
-    }
-})
+  })
+  
+const __dirname = path.resolve();
+app.use('/', express.static(path.join(__dirname, './clientside/build')))
+app.use('*', express.static(path.join(__dirname, './clientside/build')))
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)

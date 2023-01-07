@@ -21,6 +21,25 @@ function Render() {
 
   let { state, dispatch } = useContext(GlobalContext);
 
+  const logutHandler = async () => {
+
+    const baseUrl = 'http://localhost:5000';
+
+    try {
+      let response = await axios.post(`${baseUrl}/logout`, {
+      withCredentials: true
+    })
+
+    dispatch({
+      type: "USER_LOGOUT"
+    })
+    
+    } catch (error) {
+      console.log("error: ", error);
+    }
+
+  }
+
   useEffect(() => {
     const baseUrl = 'http://localhost:5000'
 
@@ -60,6 +79,7 @@ function Render() {
             <li> <Link to={'/gallery'}>Gallery</Link></li>
             <li> <Link to={'/about'}>About</Link></li>
             <li> <Link to={'/profile'}>Profile</Link></li>
+            <li> <button onClick={logutHandler}>Logout</button></li>
           </ul>
           :
           null
@@ -67,10 +87,11 @@ function Render() {
 
       {
         (state.isLogin === false) ?
-          <ul>
-            <li> <Link to={'/'}>Login</Link></li>
-            <li> <Link to={'/signup'}>Signup</Link></li>
-          </ul>
+          // <ul>
+          //   <li> <Link to={'/'}>Login</Link></li>
+          //   <li> <Link to={'/signup'}>Signup</Link></li>
+          // </ul>
+          ""
           :
           null
       }
