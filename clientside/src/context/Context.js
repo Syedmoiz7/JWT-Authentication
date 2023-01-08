@@ -5,7 +5,9 @@ export const GlobalContext = createContext("Initial Value");
 let data = {
   darkTheme: true,
   user: {},
-  isLogin: null
+  isLogin: null,
+  baseUrl: (window.location.href.split(":")[0] === "http") ? 
+  `http://localhost:5000/api/v1` : `/api/v1`
 }
 
 export default function ContextProvider({ children }) {

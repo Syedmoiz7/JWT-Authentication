@@ -7,7 +7,6 @@ import { useContext } from "react";
 
 import axios from 'axios';
 
-const baseUrl = 'http://localhost:5000'
 
 
 function Login() {
@@ -22,7 +21,7 @@ function Login() {
         e.preventDefault();
 
         try {
-            let response = await axios.post(`${baseUrl}/login`, {
+            let response = await axios.post(`${state.baseUrl}/login`, {
                 email: email,
                 password: password
             }, {

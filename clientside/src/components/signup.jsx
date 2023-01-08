@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { Routes, Route, Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import './signup.css';
 import axios from 'axios';
 
-
-const baseUrl = 'http://localhost:5000'
+import { GlobalContext } from '../context/Context';
+import { useContext } from "react";
 
 
 function Signup() {
+
+    let { state, dispatch } = useContext(GlobalContext);
 
     const [name, setName] = useState("")
     // const [lastName, setLastName] = useState("")
@@ -20,7 +22,7 @@ function Signup() {
         e.preventDefault();
 
         try {
-            let response = await axios.post(`${baseUrl}/signup`, {
+            let response = await axios.post(`${state.baseUrl}/signup`, {
                 firstName: name,
                 lastName: name,
                 email: email,

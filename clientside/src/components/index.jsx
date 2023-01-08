@@ -23,10 +23,9 @@ function Render() {
 
   const logutHandler = async () => {
 
-    const baseUrl = 'http://localhost:5000';
 
     try {
-      let response = await axios.post(`${baseUrl}/logout`, {
+      let response = await axios.post(`${state.baseUrl}/logout`, {
       withCredentials: true
     })
 
@@ -41,12 +40,11 @@ function Render() {
   }
 
   useEffect(() => {
-    const baseUrl = 'http://localhost:5000'
 
     const getProfile = async () => {
 
       try {
-        let response = await axios.get(`${baseUrl}/products`, {
+        let response = await axios.get(`${state.baseUrl}/products`, {
         withCredentials: true
       })
 
