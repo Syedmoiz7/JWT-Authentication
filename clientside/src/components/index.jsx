@@ -21,18 +21,21 @@ function Render() {
 
   let { state, dispatch } = useContext(GlobalContext);
 
+  console.log("state: ", state);
+
   const logutHandler = async () => {
 
 
     try {
-      let response = await axios.post(`${state.baseUrl}/logout`, {
-      withCredentials: true
-    })
+      let response = await axios.post(`${state.baseUrl}/logout`,
+        {}, {
+        withCredentials: true
+      })
 
-    dispatch({
-      type: "USER_LOGOUT"
-    })
-    
+      dispatch({
+        type: "USER_LOGOUT"
+      })
+
     } catch (error) {
       console.log("error: ", error);
     }
@@ -44,13 +47,14 @@ function Render() {
     const getProfile = async () => {
 
       try {
-        let response = await axios.get(`${state.baseUrl}/products`, {
-        withCredentials: true
-      })
+        let response = await axios.get(`${state.baseUrl}/profile`, {
+          withCredentials: true
+        })
 
-      dispatch({
-        type: "USER_LOGIN"
-      })
+        dispatch({
+          type: "USER_LOGIN",
+          payload: response.data
+        })
       } catch (error) {
 
         console.log("error: ", error);
@@ -59,12 +63,41 @@ function Render() {
         })
       }
 
-      
+
     }
     getProfile()
   }, []);
 
-  // const [isLogin, setIsLogin] = useState(false)
+  useEffect(() => {
+    
+    // Add a request interceptor
+    axios.interceptors.request.use(function (config) {
+      // Do something before request is sent
+      config.withCredentials = true
+      return config;
+    }, function (error) {
+      // Do something with request error
+      return Promise.reject(error);
+    });
+
+    // Add a response interceptor
+    axios.interceptors.response.use(function (response) {
+      // Any status code that lie within the range of 2xx cause this function to trigger
+      // Do something with response data
+      return response;
+    }, function (error) {
+      // Any status codes that falls outside the range of 2xx cause this function to trigger
+      // Do something with response error
+
+      if (error.response.status === 401) {
+        dispatch({
+          type: "USER_LOGOUT"
+        })
+      } 
+      return Promise.reject(error);
+    });
+  }, [])
+
 
   return (
 
@@ -72,13 +105,15 @@ function Render() {
 
       {
         (state.isLogin === true) ?
-          <ul>
-            <li> <Link to={'/'}>Home</Link></li>
-            <li> <Link to={'/gallery'}>Gallery</Link></li>
-            <li> <Link to={'/about'}>About</Link></li>
-            <li> <Link to={'/profile'}>Profile</Link></li>
-            <li> <button onClick={logutHandler}>Logout</button></li>
-          </ul>
+          <div className='navbar'>
+            <ul>
+              <li> <Link to={'/'}>Home</Link></li>
+              <li> <Link to={'/gallery'}>Gallery</Link></li>
+              <li> <Link to={'/about'}>About</Link></li>
+              <li> <Link to={'/profile'}>Profile</Link></li>
+            </ul>
+            <div> {state?.user?.firstName} <button onClick={logutHandler}>Logout</button></div>
+          </div>
           :
           null
       }

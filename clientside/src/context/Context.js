@@ -6,7 +6,7 @@ let data = {
   darkTheme: true,
   user: {},
   isLogin: null,
-  baseUrl: (window.location.href.split(":")[0] === "http") ? 
+  baseUrl: (window.location.href.includes('localhost')) ? 
   `http://localhost:5000/api/v1` : `/api/v1`
 }
 

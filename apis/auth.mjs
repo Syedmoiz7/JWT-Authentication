@@ -159,9 +159,10 @@ router.post("/login", (req, res) => {
 
 router.post("/logout", (req, res) => {
 
-    res.cookie('Token', '', {
-        maxAge: 1,
-        httpOnly: true
+    res.clearCookie('Token', {
+        httpOnly: true,
+        samesite: "none",
+        secure: true
     });
 
     res.send({ message: "Logout successful" });

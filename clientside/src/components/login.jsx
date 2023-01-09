@@ -10,7 +10,7 @@ import axios from 'axios';
 
 
 function Login() {
-    
+
     let { state, dispatch } = useContext(GlobalContext);
 
     const [email, setEmail] = useState("")
@@ -30,7 +30,7 @@ function Login() {
 
             dispatch({
                 type: "USER_LOGIN",
-                payload: null
+                payload: response.data.profile
             })
 
             console.log("login successfull");

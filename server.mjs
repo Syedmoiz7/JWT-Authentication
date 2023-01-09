@@ -7,6 +7,8 @@ import cookieParser from 'cookie-parser';
 
 import authApis from "./apis/auth.mjs"
 import productApis from "./apis/product.mjs"
+import { userModel } from './dbRepo/models.mjs';
+import { get } from 'http';
 
 const SECRET = process.env.SECRET || "topsecret";
 
@@ -23,7 +25,9 @@ app.use(cors({
   credentials: true
 }));
 
+
 app.use("/api/v1", authApis)
+
 
 app.use("/api/v1", (req, res, next) => {
   console.log("req.cookies: ", req.cookies);
@@ -63,11 +67,48 @@ app.use("/api/v1", (req, res, next) => {
   });
 })
 
+
 app.use("/api/v1", productApis)
+
+
+const getUser = async (req, res) => {
+
+  let _id = "";
+  if (req.params.id) {
+    _id = req.params.id
+  } else {
+    _id = req.body.token._id
+  }
+
+  try {
+    const user = await userModel.findOne({ _id: _id }).exec();
+
+    if (!user) {
+      res.status(404);
+      return
+
+    } else {
+      res.status(200).send(user)
+    }
+
+  } catch (error) {
+    console.log("error: ", error);
+    res.status(500).send({
+      message: "something went wrong on server"
+    })
+  }
+  
+}
+
+app.get('/api/v1/profile', getUser );
+
+app.get('/api/v1/profile/:id', getUser);
+
 
 const __dirname = path.resolve();
 app.use('/', express.static(path.join(__dirname, './clientside/build')))
 app.use('*', express.static(path.join(__dirname, './clientside/build')))
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
